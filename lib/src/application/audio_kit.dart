@@ -1,26 +1,25 @@
-import 'package:audio_manager/src/domain/models/audio_source_entry.dart';
 import 'package:meta/meta.dart';
 
-import '../domain/models/audio_status.dart';
+import '../../audio_kit.dart';
 import '../domain/repositories/audio_repository_i.dart';
 import '../infrastructure/just_audio_repository.dart';
 
 enum AudioPackageType { justAudio }
 
-class AudioManager {
-  static AudioManager? _instance;
+class AudioKit {
+  static AudioKit? _instance;
   late final AudioRepository _repository;
 
   /// ファクトリコンストラクタ（シングルトン）
-  factory AudioManager({
+  factory AudioKit({
     AudioPackageType type = AudioPackageType.justAudio,
     double masterVolume = 1.0,
   }) {
-    _instance ??= AudioManager._internal(type, masterVolume);
+    _instance ??= AudioKit._internal(type, masterVolume);
     return _instance!;
   }
 
-  AudioManager._internal(AudioPackageType type, double masterVolume) {
+  AudioKit._internal(AudioPackageType type, double masterVolume) {
     switch (type) {
       case AudioPackageType.justAudio:
         _repository = JustAudioRepository(masterVolume: masterVolume);

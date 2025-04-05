@@ -1,11 +1,11 @@
-name: audio_manager
-description: "A new Flutter project."
+name: audio_kit
+description: "A flexible audio playback manager for Flutter."
 version: 0.0.1
-homepage:
+homepage: https://github.com/take-p/audio_kit
 
 environment:
   sdk: ^3.7.0
-  flutter: ">=1.17.0"
+  flutter: ">=3.10.0"
 
 dependencies:
   flutter:

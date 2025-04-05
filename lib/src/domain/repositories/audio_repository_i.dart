@@ -1,7 +1,4 @@
-// lib/src/domain/repositories/audio_repository_i.dart
-import 'package:audio_manager/src/domain/models/audio_source_entry.dart';
-
-import '../models/audio_status.dart';
+import '../../../audio_kit.dart';
 
 abstract interface class AudioRepository {
   /// キーとファイルパスのペアを登録
