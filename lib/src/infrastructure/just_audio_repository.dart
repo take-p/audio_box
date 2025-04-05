@@ -122,6 +122,9 @@ class JustAudioRepository implements AudioRepository {
   }
 
   @override
+  double getMasterVolume() => _masterVolume;
+
+  @override
   Future<void> setMasterVolume(double volume) async {
     _masterVolume = _adjustVolume(volume.clamp(0.0, 1.0));
     for (final entry in _playerSettings.entries) {
@@ -132,7 +135,7 @@ class JustAudioRepository implements AudioRepository {
   }
 
   @override
-  double getMasterVolume() => _masterVolume;
+  double getMasterSpeed() => _masterSpeed;
 
   @override
   Future<void> setMasterSpeed(double speed) async {
@@ -140,15 +143,12 @@ class JustAudioRepository implements AudioRepository {
   }
 
   @override
-  double getMasterSpeed() => _masterSpeed;
+  double getMasterPitch() => _masterPitch;
 
   @override
   Future<void> setMasterPitch(double pitch) async {
-    _masterPitch = pitch.clamp(0.5, 2.0);
+    throw UnimplementedError();
   }
-
-  @override
-  double getMasterPitch() => _masterPitch;
 
   @override
   Future<void> play({
@@ -396,7 +396,7 @@ class JustAudioRepository implements AudioRepository {
   }
 
   @override
-  Future<void> setVolume({
+  Future<void> changeVolume({
     String? key,
     String? channel,
     required double volume,
@@ -444,7 +444,7 @@ class JustAudioRepository implements AudioRepository {
   Future<void> changeSpeed({
     String? key,
     String? channel,
-    required double playSpeed,
+    required double speed,
     Duration? fadeDuration,
   }) async {
     if (key != null && channel != null) {
@@ -457,11 +457,11 @@ class JustAudioRepository implements AudioRepository {
         await _fadeSpeed(
           player,
           from: player.speed,
-          to: playSpeed,
+          to: speed,
           duration: fadeDuration,
         );
       } else {
-        await player.setSpeed(playSpeed);
+        await player.setSpeed(speed);
       }
     } else {
       if (!_players.containsKey(key)) return;
@@ -470,14 +470,25 @@ class JustAudioRepository implements AudioRepository {
           await _fadeSpeed(
             player,
             from: player.speed,
-            to: playSpeed,
+            to: speed,
             duration: fadeDuration,
           );
         } else {
-          await player.setSpeed(playSpeed);
+          await player.setSpeed(speed);
         }
       }
     }
+  }
+
+  @override
+  Future<void> changePitch({
+    String? key,
+    String? channel,
+    required double pitch,
+    Duration? fadeDuration,
+  }) {
+    // TODO: implement changePitch
+    throw UnimplementedError();
   }
 
   // ----- Private Helpers -----

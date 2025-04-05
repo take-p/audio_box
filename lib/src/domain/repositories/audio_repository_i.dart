@@ -16,23 +16,23 @@ abstract interface class AudioRepository {
   Future<void> disposeAll({required List<String> keys});
 
   /// マスターボリューム
-  Future<void> setMasterVolume(double volume);
   double getMasterVolume();
+  Future<void> setMasterVolume(double volume);
 
   /// マスタースピード
-  Future<void> setMasterSpeed(double speed);
   double getMasterSpeed();
+  Future<void> setMasterSpeed(double speed);
 
-  /// マスターピッチ TODO 今後実装
-  Future<void> setMasterPitch(double pitch);
+  /// マスターピッチ
   double getMasterPitch();
+  Future<void> setMasterPitch(double pitch);
 
   /// 音声操作
   ///
   /// - [key] は必須です。
   /// - [channel] を指定した場合、そのチャンネルに対して処理を行います。
   ///   （playメソッドでは、keyとchannelを同時指定可能です）
-  /// - [stop]、[pause]、[resume]、[setVolume]、[changeSpeed] では、keyとchannelが同時指定された場合はエラーをスローし、
+  /// - [stop]、[pause]、[resume]、[changeVolume]、[changeSpeed] では、keyとchannelが同時指定された場合はエラーをスローし、
   ///   両方とも null の場合は全ての音声に対して処理を行います。
   Future<void> play({
     required String key,
@@ -57,7 +57,7 @@ abstract interface class AudioRepository {
   });
 
   /// 音声調整
-  Future<void> setVolume({
+  Future<void> changeVolume({
     String? key,
     String? channel,
     required double volume,
@@ -67,11 +67,16 @@ abstract interface class AudioRepository {
   Future<void> changeSpeed({
     String? key,
     String? channel,
-    required double playSpeed,
+    required double speed,
     Duration? fadeDuration,
   });
 
-  // ピッチ TODO 今後実装予定
+  Future<void> changePitch({
+    String? key,
+    String? channel,
+    required double pitch,
+    Duration? fadeDuration,
+  });
 
   /// 状態取得
   Future<bool> isPreloaded({required String key});
