@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
 
 import '../../audio_box.dart';
-import '../domain/repositories/audio_repository_i.dart';
-import '../infrastructure/just_audio_repository.dart';
+import '../domain/repositories/audio_repository.dart';
+import '../infrastructure/repositories/just_audio_repository.dart';
 
 enum AudioPackageType { justAudio }
 
@@ -63,10 +63,11 @@ class AudioBox implements AudioRepository {
       _repository.setMasterVolume(volume);
 
   @override
-  double getMasterSpeed() => getMasterSpeed();
+  double getMasterSpeed() => _repository.getMasterSpeed();
 
   @override
-  Future<void> setMasterSpeed(double speed) => setMasterSpeed(speed);
+  Future<void> setMasterSpeed(double speed) =>
+      _repository.setMasterSpeed(speed);
 
   @override
   double getMasterPitch() => _repository.getMasterPitch();
