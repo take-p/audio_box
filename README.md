@@ -1,39 +1,70 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# audio_kit
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+🎧 A simple and flexible audio manager for Flutter apps, designed to handle background music (BGM), sound effects (SE), and other audio playback with ease.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- ✅ Supports asset, file, and network audio sources
+- 🔁 Loop playback with custom start positions
+- 🔊 Volume, speed, and (planned) pitch control
+- 📦 Simple API for BGM/SE switching via key or channel
+- 🎚️ Global master volume/speed settings
+- 🚀 Designed with clean architecture and extensibility in mind
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add `audio_kit` to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  audio_kit: ^0.0.1
+```
+
+Then import it:
+
+```dart
+import 'package:audio_kit/audio_kit.dart';
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+### 1. Register audio sources
 
 ```dart
-const like = 'sample';
+await audioManager.registerAll({
+  'bgm_menu': AssetAudioSource('assets/bgm/menu.mp3'),
+  'se_click': AssetAudioSource('assets/se/click.wav'),
+});
 ```
 
-## Additional information
+### 2. Play sound
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+await audioManager.play(key: 'se_click');
+```
+
+### 3. Play BGM with fade and loop
+
+```dart
+await audioManager.play(
+  key: 'bgm_menu',
+  channel: 'bgm',
+  loop: true,
+  fadeDuration: Duration(seconds: 2),
+);
+```
+
+### 4. Set master volume
+
+```dart
+await audioManager.setMasterVolume(0.8);
+```
+
+## Example
+
+Check out the [`/example`](example) folder for a full working example.
+
+## License
+
+This package is released under the [MIT License](LICENSE).  
+Created by [take-p](https://github.com/take-p).
