@@ -6,20 +6,20 @@ import '../infrastructure/just_audio_repository.dart';
 
 enum AudioPackageType { justAudio }
 
-class AudioKit {
-  static AudioKit? _instance;
+class AudioBox {
+  static AudioBox? _instance;
   late final AudioRepository _repository;
 
   /// ファクトリコンストラクタ（シングルトン）
-  factory AudioKit({
+  factory AudioBox({
     AudioPackageType type = AudioPackageType.justAudio,
     double masterVolume = 1.0,
   }) {
-    _instance ??= AudioKit._internal(type, masterVolume);
+    _instance ??= AudioBox._internal(type, masterVolume);
     return _instance!;
   }
 
-  AudioKit._internal(AudioPackageType type, double masterVolume) {
+  AudioBox._internal(AudioPackageType type, double masterVolume) {
     switch (type) {
       case AudioPackageType.justAudio:
         _repository = JustAudioRepository(masterVolume: masterVolume);

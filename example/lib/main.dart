@@ -10,32 +10,27 @@ final sourceMap = {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final audioKit = AudioKit();
+  final AudioBox audioBox = AudioBox();
 
-  // オーディオソースの登録（Asset 使用）
-  await audioKit.registerAll(sourceMap);
+  // Registering audio sources (from assets)
+  await audioBox.registerAll(sourceMap);
 
-  runApp(MyApp(audioKit: audioKit));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final AudioKit audioKit;
-
-  const MyApp({super.key, required this.audioKit});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'audio_box Example',
-      home: AudioDemoScreen(audioKit: audioKit),
-    );
+    return MaterialApp(title: 'audio_box Example', home: AudioDemoScreen());
   }
 }
 
 class AudioDemoScreen extends StatelessWidget {
-  final AudioKit audioKit;
+  const AudioDemoScreen({super.key});
 
-  const AudioDemoScreen({super.key, required this.audioKit});
+  static AudioBox _audioBox = AudioBox();
 
   @override
   Widget build(BuildContext context) {
@@ -47,21 +42,21 @@ class AudioDemoScreen extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () async {
-                await audioKit.play(key: 'se_click');
+                await _audioBox.play(key: 'se_click');
               },
               child: const Text('Play SE'),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
-                await audioKit.play(key: 'bgm_1', channel: 'bgm', loop: true);
+                await _audioBox.play(key: 'bgm_1', channel: 'bgm', loop: true);
               },
               child: const Text('Play BGM1'),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
-                await audioKit.play(
+                await _audioBox.play(
                   key: 'bgm_2',
                   channel: 'bgm',
                   loop: true,
@@ -74,7 +69,7 @@ class AudioDemoScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
-                await audioKit.stop(channel: 'bgm');
+                await _audioBox.stop(channel: 'bgm');
               },
               child: const Text('Stop BGM'),
             ),
