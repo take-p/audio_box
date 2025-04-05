@@ -46,11 +46,7 @@ abstract interface class AudioRepository {
 
   Future<void> stop({String? key, String? channel, Duration? fadeDuration});
 
-  Future<void> pause({
-    required String key,
-    String? channel,
-    Duration? fadeDuration,
-  });
+  Future<void> pause({String? key, String? channel, Duration? fadeDuration});
 
   Future<void> resume({
     String? key,
@@ -62,14 +58,14 @@ abstract interface class AudioRepository {
 
   /// 音声調整
   Future<void> setVolume({
-    required String key,
+    String? key,
     String? channel,
     required double volume,
     Duration? fadeDuration,
   });
 
   Future<void> changeSpeed({
-    required String key,
+    String? key,
     String? channel,
     required double playSpeed,
     Duration? fadeDuration,

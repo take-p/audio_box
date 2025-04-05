@@ -397,12 +397,12 @@ class JustAudioRepository implements AudioRepository {
 
   @override
   Future<void> setVolume({
-    required String key,
+    String? key,
     String? channel,
     required double volume,
     Duration? fadeDuration,
   }) async {
-    if (key.isNotEmpty && channel != null) {
+    if (key != null && channel != null) {
       throw ArgumentError('setVolume: keyとchannelは同時に指定できません');
     }
     final perceptualVolume = _adjustVolume(volume);
@@ -442,12 +442,12 @@ class JustAudioRepository implements AudioRepository {
 
   @override
   Future<void> changeSpeed({
-    required String key,
+    String? key,
     String? channel,
     required double playSpeed,
     Duration? fadeDuration,
   }) async {
-    if (key.isNotEmpty && channel != null) {
+    if (key != null && channel != null) {
       throw ArgumentError('changeSpeed: keyとchannelは同時に指定できません');
     }
     if (channel != null) {
