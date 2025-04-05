@@ -1,4 +1,4 @@
-import '../../../audio_kit.dart';
+import '../../../audio_box.dart';
 
 abstract interface class AudioRepository {
   /// キーとファイルパスのペアを登録

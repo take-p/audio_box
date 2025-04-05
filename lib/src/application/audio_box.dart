@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 
-import '../../audio_kit.dart';
+import '../../audio_box.dart';
 import '../domain/repositories/audio_repository_i.dart';
 import '../infrastructure/just_audio_repository.dart';
 

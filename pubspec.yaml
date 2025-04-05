@@ -1,7 +1,7 @@
-name: audio_kit
+name: audio_box
 description: "A flexible audio playback manager for Flutter."
 version: 0.0.1
-homepage: https://github.com/take-p/audio_kit
+homepage: https://github.com/take-p/audio_box
 
 environment:
   sdk: ^3.7.0

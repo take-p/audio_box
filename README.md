@@ -1,4 +1,4 @@
-# audio_kit
+# audio_box
 
 🎧 A simple and flexible audio manager for Flutter apps, designed to handle background music (BGM), sound effects (SE), and other audio playback with ease.
 
@@ -13,17 +13,17 @@
 
 ## Getting started
 
-Add `audio_kit` to your `pubspec.yaml`:
+Add `audio_box` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  audio_kit: ^0.0.1
+  audio_box: ^0.0.1
 ```
 
 Then import it:
 
 ```dart
-import 'package:audio_kit/audio_kit.dart';
+import 'package:audio_box/audio_box.dart';
 ```
 
 ## Usage

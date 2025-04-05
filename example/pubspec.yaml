@@ -1,5 +1,5 @@
-name: audio_kit_example
-description: Example project using audio_kit
+name: audio_box_example
+description: Example project using audio_box
 publish_to: "none"
 
 version: 1.0.0
@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  audio_kit:
+  audio_box:
     path: ../
 
 dev_dependencies:

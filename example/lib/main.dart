@@ -1,4 +1,4 @@
-import 'package:audio_kit/audio_kit.dart';
+import 'package:audio_box/audio_box.dart';
 import 'package:flutter/material.dart';
 
 final sourceMap = {
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'audio_kit Example',
+      title: 'audio_box Example',
       home: AudioDemoScreen(audioKit: audioKit),
     );
   }
@@ -40,7 +40,7 @@ class AudioDemoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('audio_kit Example')),
+      appBar: AppBar(title: const Text('audio_box Example')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
