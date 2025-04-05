@@ -10,8 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_hooks: ^0.20.5
-  http: ^1.3.0
   just_audio: ^0.9.46
   meta: ^1.16.0
 
