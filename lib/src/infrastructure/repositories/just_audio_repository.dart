@@ -4,10 +4,10 @@ import 'dart:math';
 
 import 'package:just_audio/just_audio.dart';
 
-import '../domain/models/audio_source_entry.dart';
-import '../domain/models/audio_status.dart';
-import '../domain/models/player_settings.dart';
-import '../domain/repositories/audio_repository.dart';
+import '../../domain/models/audio_source_entry.dart';
+import '../../domain/models/audio_status.dart';
+import '../../domain/models/player_settings.dart';
+import '../../domain/repositories/audio_repository.dart';
 
 class JustAudioRepository implements AudioRepository {
   final _sourceMap = <String, AudioSourceEntry>{};
