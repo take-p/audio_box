@@ -7,7 +7,7 @@ import 'package:just_audio/just_audio.dart';
 import '../domain/models/audio_source_entry.dart';
 import '../domain/models/audio_status.dart';
 import '../domain/models/player_settings.dart';
-import '../domain/repositories/audio_repository_i.dart';
+import '../domain/repositories/audio_repository.dart';
 
 class JustAudioRepository implements AudioRepository {
   final _sourceMap = <String, AudioSourceEntry>{};
@@ -140,6 +140,11 @@ class JustAudioRepository implements AudioRepository {
   @override
   Future<void> setMasterSpeed(double speed) async {
     _masterSpeed = speed.clamp(0.5, 2.0);
+    for (final entry in _playerSettings.entries) {
+      final player = entry.key;
+      final PlayerSettings playerSettings = entry.value;
+      await player.setSpeed(playerSettings.speed * _masterSpeed);
+    }
   }
 
   @override
@@ -147,6 +152,7 @@ class JustAudioRepository implements AudioRepository {
 
   @override
   Future<void> setMasterPitch(double pitch) async {
+    // TODO just_audio がピッチ調整に対応し次第実装
     throw UnimplementedError();
   }
 
