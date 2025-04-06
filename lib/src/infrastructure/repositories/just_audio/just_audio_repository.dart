@@ -4,10 +4,10 @@ import 'dart:math';
 
 import 'package:just_audio/just_audio.dart';
 
-import '../../domain/models/audio_source_entry.dart';
-import '../../domain/models/audio_status.dart';
-import '../../domain/models/player_settings.dart';
-import '../../domain/repositories/audio_repository.dart';
+import '../../../domain/models/audio_source_entry.dart';
+import '../../../domain/models/audio_status.dart';
+import '../../../domain/models/player_settings.dart';
+import '../../../domain/repositories/audio_repository.dart';
 
 class JustAudioRepository implements AudioRepository {
   final _sourceMap = <String, AudioSourceEntry>{};
@@ -103,22 +103,22 @@ class JustAudioRepository implements AudioRepository {
   }
 
   @override
-  Future<bool> isPreloaded({required String key}) async {
-    return _status[key] == AudioStatus.preloaded;
+  Future<bool> isPreloaded({required String channel}) async {
+    return _status[channel] == AudioStatus.preloaded;
   }
 
   @override
-  Future<AudioStatus> getStatus({required String key}) async {
-    return _status[key] ?? AudioStatus.notInitialized;
+  Future<AudioStatus> getStatus({required String channel}) async {
+    return _status[channel] ?? AudioStatus.notInitialized;
   }
 
   @override
-  Future<Duration> getPosition({required String key}) async {
+  Future<Duration> getPosition({required String channel}) async {
     // channel指定の場合は対象外。ここはキーごとのListから先頭のものを返す
-    if (!_players.containsKey(key) || _players[key]!.isEmpty) {
+    if (!_players.containsKey(channel) || _players[channel]!.isEmpty) {
       return Duration.zero;
     }
-    return _players[key]!.first.position;
+    return _players[channel]!.first.position;
   }
 
   @override
@@ -158,40 +158,43 @@ class JustAudioRepository implements AudioRepository {
 
   @override
   Future<void> play({
-    required String key,
-    String? channel,
+    required String audioKey,
+    String? channelKey,
+    double volume = 1.0,
+    double speed = 1.0,
+    double pitch = 1.0,
     bool loop = false,
     Duration? fadeDuration,
+    Duration? loopStart,
+    Duration? loopEnd,
     Duration? playPosition,
-    double? playSpeed,
-    Duration? loopStartPosition,
   }) async {
-    if (!_sourceMap.containsKey(key)) {
-      throw ArgumentError('No path registered for key: $key');
+    if (!_sourceMap.containsKey(audioKey)) {
+      throw ArgumentError('No path registered for key: $audioKey');
     }
-    if (loopStartPosition != null && loop != true) {
+    if (playPosition != null && loop != true) {
       throw ArgumentError('loopStartPosition requires loop: true');
     }
 
     late AudioPlayer player;
-    if (channel != null) {
+    if (channelKey != null) {
       // channel指定の場合：1チャンネルにつき1つのプレイヤーを利用
-      if (_playersByChannel.containsKey(channel)) {
-        player = _playersByChannel[channel]!;
+      if (_playersByChannel.containsKey(channelKey)) {
+        player = _playersByChannel[channelKey]!;
         await player.stop();
       } else {
         player = AudioPlayer();
-        _playersByChannel[channel] = player;
+        _playersByChannel[channelKey] = player;
         _playerSettings[player]?.volume = 1.0;
       }
     } else {
       // channel==null → 連続再生可能（新規プレイヤー作成）
       player = AudioPlayer();
       _playerSettings[player]?.volume = 1.0;
-      _players.putIfAbsent(key, () => []).add(player);
+      _players.putIfAbsent(audioKey, () => []).add(player);
     }
 
-    await _setSourceToPlayer(player, _sourceMap[key]!);
+    await _setSourceToPlayer(player, _sourceMap[audioKey]!);
 
     if (loop) {
       player.setLoopMode(LoopMode.one);
@@ -199,11 +202,11 @@ class JustAudioRepository implements AudioRepository {
       player.setLoopMode(LoopMode.off);
     }
 
-    if (playPosition != null) {
-      await player.seek(playPosition);
+    if (loopStart != null) {
+      await player.seek(loopStart);
     }
-    if (playSpeed != null) {
-      await player.setSpeed(playSpeed);
+    if (speed != null) {
+      await player.setSpeed(speed);
     }
     if (fadeDuration != null) {
       final PlayerSettings playerSettings =
@@ -216,12 +219,12 @@ class JustAudioRepository implements AudioRepository {
       );
     }
     await player.play();
-    _status[key] = AudioStatus.playing;
+    _status[audioKey] = AudioStatus.playing;
 
-    if (loop && loopStartPosition != null) {
+    if (loop && playPosition != null) {
       player.processingStateStream.listen((state) {
         if (state == ProcessingState.completed) {
-          player.seek(loopStartPosition);
+          player.seek(playPosition);
           player.play();
         }
       });
@@ -231,26 +234,26 @@ class JustAudioRepository implements AudioRepository {
   @override
   Future<void> stop({
     String? key,
-    String? channel,
+    String? channelKey,
     Duration? fadeDuration,
   }) async {
     // エラー判定：stop, pause, resume では key と channel の両方が指定された場合エラー
-    if (key != null && channel != null) {
+    if (key != null && channelKey != null) {
       throw ArgumentError('stop: keyとchannelは同時に指定できません');
     }
     // 両方とも null の場合は全停止
-    if (key == null && channel == null) {
+    if (key == null && channelKey == null) {
       for (final k in _players.keys.toList()) {
         await stop(key: k, fadeDuration: fadeDuration);
       }
       for (final ch in _playersByChannel.keys.toList()) {
-        await stop(channel: ch, fadeDuration: fadeDuration);
+        await stop(channelKey: ch, fadeDuration: fadeDuration);
       }
       return;
     }
 
-    if (channel != null) {
-      final player = _playersByChannel[channel];
+    if (channelKey != null) {
+      final player = _playersByChannel[channelKey];
       if (player == null) return;
       if (fadeDuration != null) {
         final currentUserVol = (player.volume / _masterVolume);
@@ -262,7 +265,7 @@ class JustAudioRepository implements AudioRepository {
         );
       }
       await player.stop();
-      _playersByChannel.remove(channel);
+      _playersByChannel.remove(channelKey);
     } else if (key != null) {
       if (!_players.containsKey(key)) return;
       for (final player in _players[key]!) {
@@ -285,15 +288,15 @@ class JustAudioRepository implements AudioRepository {
   @override
   Future<void> pause({
     String? key,
-    String? channel,
+    String? channelKey,
     Duration? fadeDuration,
   }) async {
     // key と channel の同時指定はエラー
-    if (key != null && channel != null) {
+    if (key != null && channelKey != null) {
       throw ArgumentError('pause: keyとchannelは同時に指定できません');
     }
-    if (channel != null) {
-      final player = _playersByChannel[channel];
+    if (channelKey != null) {
+      final player = _playersByChannel[channelKey];
       if (player == null) return;
       if (fadeDuration != null) {
         final currentUserVol = (player.volume / _masterVolume);
@@ -326,44 +329,47 @@ class JustAudioRepository implements AudioRepository {
   @override
   Future<void> resume({
     String? key,
-    String? channel,
+    String? channelKey,
+    double volume = 1.0,
+    double speed = 1.0,
+    double pitch = 1.0,
+    bool? loop,
     Duration? fadeDuration,
     Duration? playPosition,
-    double? playSpeed,
   }) async {
     // key と channel の同時指定はエラー
-    if (key != null && channel != null) {
+    if (key != null && channelKey != null) {
       throw ArgumentError('resume: keyとchannelは同時に指定できません');
     }
     // 両方とも null の場合は全再生
-    if (key == null && channel == null) {
+    if (key == null && channelKey == null) {
       for (final k in _players.keys) {
         await resume(
           key: k,
           fadeDuration: fadeDuration,
           playPosition: playPosition,
-          playSpeed: playSpeed,
+          speed: speed,
         );
       }
       for (final ch in _playersByChannel.keys) {
         await resume(
-          channel: ch,
+          channelKey: ch,
           fadeDuration: fadeDuration,
           playPosition: playPosition,
-          playSpeed: playSpeed,
+          speed: speed,
         );
       }
       return;
     }
 
-    if (channel != null) {
-      final player = _playersByChannel[channel];
+    if (channelKey != null) {
+      final player = _playersByChannel[channelKey];
       if (player == null) return;
       if (playPosition != null) {
         await player.seek(playPosition);
       }
-      if (playSpeed != null) {
-        await player.setSpeed(playSpeed);
+      if (speed != null) {
+        await player.setSpeed(speed);
       }
       if (fadeDuration != null) {
         final PlayerSettings playerSettings = _playerSettings[player]!;
@@ -381,8 +387,8 @@ class JustAudioRepository implements AudioRepository {
         if (playPosition != null) {
           await player.seek(playPosition);
         }
-        if (playSpeed != null) {
-          await player.setSpeed(playSpeed);
+        if (speed != null) {
+          await player.setSpeed(speed);
         }
         if (fadeDuration != null) {
           final PlayerSettings playerSettings = _playerSettings[player]!;

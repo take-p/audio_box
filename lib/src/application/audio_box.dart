@@ -1,10 +1,11 @@
+import 'package:audio_box/src/infrastructure/repositories/audioplayers/audioplayers_repository.dart';
 import 'package:meta/meta.dart';
 
 import '../../audio_box.dart';
 import '../domain/repositories/audio_repository.dart';
-import '../infrastructure/repositories/just_audio_repository.dart';
+import '../infrastructure/repositories/just_audio/just_audio_repository.dart';
 
-enum AudioPackageType { justAudio }
+enum AudioPackageType { justAudio, audioplayers }
 
 class AudioBox implements AudioRepository {
   static AudioBox? _instance;
@@ -12,7 +13,7 @@ class AudioBox implements AudioRepository {
 
   /// ファクトリコンストラクタ（シングルトン）
   factory AudioBox({
-    AudioPackageType type = AudioPackageType.justAudio,
+    AudioPackageType type = AudioPackageType.audioplayers,
     double masterVolume = 1.0,
   }) {
     _instance ??= AudioBox._internal(type, masterVolume);
@@ -23,6 +24,9 @@ class AudioBox implements AudioRepository {
     switch (type) {
       case AudioPackageType.justAudio:
         _repository = JustAudioRepository(masterVolume: masterVolume);
+        break;
+      case AudioPackageType.audioplayers:
+        _repository = AudioPlayersRepository();
         break;
     }
   }
@@ -79,54 +83,55 @@ class AudioBox implements AudioRepository {
   // ===== 音声制御 =====
   @override
   Future<void> play({
-    required String key,
-    String? channel,
+    required String audioKey,
+    String? channelKey,
+    double volume = 1.0,
+    double speed = 1.0,
+    double pitch = 1.0,
     bool loop = false,
     Duration? fadeDuration,
+    Duration? loopStart,
+    Duration? loopEnd,
     Duration? playPosition,
-    double? playSpeed,
-    Duration? loopStartPosition,
   }) => _repository.play(
-    key: key,
-    channel: channel,
+    audioKey: audioKey,
+    channelKey: channelKey,
     loop: loop,
     fadeDuration: fadeDuration,
+    loopStart: loopStart,
+    speed: speed,
     playPosition: playPosition,
-    playSpeed: playSpeed,
-    loopStartPosition: loopStartPosition,
   );
 
   @override
-  Future<void> stop({String? key, String? channel, Duration? fadeDuration}) =>
-      _repository.stop(key: key, channel: channel, fadeDuration: fadeDuration);
+  Future<void> stop({required String channelKey, Duration? fadeDuration}) =>
+      _repository.stop(channelKey: channelKey, fadeDuration: fadeDuration);
 
   @override
-  Future<void> pause({String? key, String? channel, Duration? fadeDuration}) =>
-      _repository.pause(key: key, channel: channel, fadeDuration: fadeDuration);
+  Future<void> pause({required String channelKey, Duration? fadeDuration}) =>
+      _repository.pause(channelKey: channelKey, fadeDuration: fadeDuration);
 
   @override
   Future<void> resume({
-    String? key,
-    String? channel,
+    required String channelKey,
+    bool? loop,
+    double volume = 1.0,
+    double speed = 1.0,
+    double pitch = 1.0,
     Duration? fadeDuration,
     Duration? playPosition,
-    double? playSpeed,
   }) => _repository.resume(
-    key: key,
-    channel: channel,
+    channelKey: channelKey,
     fadeDuration: fadeDuration,
     playPosition: playPosition,
-    playSpeed: playSpeed,
   );
 
   @override
   Future<void> changeVolume({
-    String? key,
-    String? channel,
+    required String channel,
     required double volume,
     Duration? fadeDuration,
   }) => _repository.changeVolume(
-    key: key,
     channel: channel,
     volume: volume,
     fadeDuration: fadeDuration,
@@ -134,12 +139,10 @@ class AudioBox implements AudioRepository {
 
   @override
   Future<void> changeSpeed({
-    String? key,
-    String? channel,
+    required String channel,
     required double speed,
     Duration? fadeDuration,
   }) => _repository.changeSpeed(
-    key: key,
     channel: channel,
     speed: speed,
     fadeDuration: fadeDuration,
@@ -147,8 +150,7 @@ class AudioBox implements AudioRepository {
 
   @override
   Future<void> changePitch({
-    String? key,
-    String? channel,
+    required String channel,
     required double pitch,
     Duration? fadeDuration,
   }) {
@@ -158,12 +160,12 @@ class AudioBox implements AudioRepository {
 
   // ===== 状態取得 =====
   @override
-  Future<bool> isPreloaded({required String key}) =>
-      _repository.isPreloaded(key: key);
+  Future<bool> isPreloaded({required String channel}) =>
+      _repository.isPreloaded(channel: channel);
   @override
-  Future<AudioStatus> getStatus({required String key}) =>
-      _repository.getStatus(key: key);
+  Future<AudioStatus> getStatus({required String channel}) =>
+      _repository.getStatus(channel: channel);
   @override
-  Future<Duration> getPosition({required String key}) =>
-      _repository.getPosition(key: key);
+  Future<Duration> getPosition({required String channel}) =>
+      _repository.getPosition(channel: channel);
 }
