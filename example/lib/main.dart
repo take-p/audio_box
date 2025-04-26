@@ -140,6 +140,13 @@ class _AudioDemoScreenState extends State<AudioDemoScreen> {
                   },
                 ),
 
+                buildButton("✅ Resume BGM (BGM再開)", true, true, () async {
+                  await _audioBox.resume(channelKey: 'bgm');
+                }),
+                buildButton("✅ Pause BGM (BGM一時停止)", true, true, () async {
+                  await _audioBox.pause(channelKey: 'bgm');
+                }),
+
                 buildButton(
                   "✅ Play BGM1 with fade-in (BGM1フェードイン)",
                   true,
@@ -157,7 +164,7 @@ class _AudioDemoScreenState extends State<AudioDemoScreen> {
                 // Fades out the audio associated with the specified `channelKey`.
                 // 指定した`channelKey`に関連付けられた音声をフェードアウトします。
                 buildButton(
-                  "❌ Stop BGM with fade-out (BGMフェードアウト)",
+                  "✅ Stop BGM with fade-out (BGMフェードアウト)",
                   true,
                   true,
                   () async {
@@ -168,7 +175,7 @@ class _AudioDemoScreenState extends State<AudioDemoScreen> {
                   },
                 ),
                 buildButton(
-                  "❌ Resume BGM with fade-in (BGM再開フェードイン)",
+                  "✅ Resume BGM with fade-in (BGM再開フェードイン)",
                   true,
                   true,
                   () async {
@@ -179,7 +186,7 @@ class _AudioDemoScreenState extends State<AudioDemoScreen> {
                   },
                 ),
                 buildButton(
-                  "❌ Pause BGM with fade-out (BGM一時停止フェードアウト)",
+                  "✅ Pause BGM with fade-out (BGM一時停止フェードアウト)",
                   true,
                   true,
                   () async {

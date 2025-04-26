@@ -44,7 +44,6 @@ abstract interface class AudioRepository {
     Duration? fadeDuration,
     Duration? loopStart,
     Duration? loopEnd,
-
     Duration? playPosition,
   });
 
