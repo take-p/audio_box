@@ -21,3 +21,9 @@
 ### 変更点
 - メソッド`setVolume`を`changeVolueme`に改名。
 - AudioRepositoryインターフェースとAudioBoxクラスで実装メソッドの引数の型に違いがあった点を修正
+- 
+## [0.0.5] - 2025-04-27
+
+### 変更点
+- デフォルトで使用するパッケージを`just_audio`から`audioplayers`に変更
+- サンプルアプリを`audioplayers`に合わせて修正

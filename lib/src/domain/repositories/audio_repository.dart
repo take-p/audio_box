@@ -48,7 +48,7 @@ abstract interface class AudioRepository {
     Duration? playPosition,
   });
 
-  Future<void> stop({required String channelKey, Duration? fadeDuration});
+  Future<void> stop({String? channelKey, Duration? fadeDuration});
 
   Future<void> pause({required String channelKey, Duration? fadeDuration});
 

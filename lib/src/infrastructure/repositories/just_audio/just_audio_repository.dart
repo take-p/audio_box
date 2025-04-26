@@ -205,9 +205,7 @@ class JustAudioRepository implements AudioRepository {
     if (loopStart != null) {
       await player.seek(loopStart);
     }
-    if (speed != null) {
-      await player.setSpeed(speed);
-    }
+    await player.setSpeed(speed);
     if (fadeDuration != null) {
       final PlayerSettings playerSettings =
           _playerSettings[player] ?? PlayerSettings();
@@ -232,57 +230,49 @@ class JustAudioRepository implements AudioRepository {
   }
 
   @override
-  Future<void> stop({
-    String? key,
-    String? channelKey,
-    Duration? fadeDuration,
-  }) async {
-    // エラー判定：stop, pause, resume では key と channel の両方が指定された場合エラー
-    if (key != null && channelKey != null) {
-      throw ArgumentError('stop: keyとchannelは同時に指定できません');
-    }
-    // 両方とも null の場合は全停止
-    if (key == null && channelKey == null) {
-      for (final k in _players.keys.toList()) {
-        await stop(key: k, fadeDuration: fadeDuration);
-      }
-      for (final ch in _playersByChannel.keys.toList()) {
-        await stop(channelKey: ch, fadeDuration: fadeDuration);
-      }
-      return;
-    }
-
-    if (channelKey != null) {
-      final player = _playersByChannel[channelKey];
-      if (player == null) return;
-      if (fadeDuration != null) {
-        final currentUserVol = (player.volume / _masterVolume);
-        await _fadeVolume(
-          player,
-          from: currentUserVol,
-          to: 0.0,
-          duration: fadeDuration,
-        );
-      }
-      await player.stop();
-      _playersByChannel.remove(channelKey);
-    } else if (key != null) {
-      if (!_players.containsKey(key)) return;
-      for (final player in _players[key]!) {
-        if (fadeDuration != null) {
-          final currentUserVol = (player.volume / _masterVolume);
-          await _fadeVolume(
-            player,
-            from: currentUserVol,
-            to: 0.0,
-            duration: fadeDuration,
-          );
-        }
-        await player.stop();
-      }
-      _status[key] = AudioStatus.stopped;
-      _players.remove(key);
-    }
+  Future<void> stop({String? channelKey, Duration? fadeDuration}) async {
+    // channelKey が null の場合は全ての音声を停止
+    // if (channelKey == null) {
+    //   for (final k in _players.keys.toList()) {
+    //     await stop(audioKey: k, fadeDuration: fadeDuration);
+    //   }
+    //   for (final ch in _playersByChannel.keys.toList()) {
+    //     await stop(channelKey: ch, fadeDuration: fadeDuration);
+    //   }
+    //   return;
+    // }
+    //
+    // if (channelKey != null) {
+    //   final player = _playersByChannel[channelKey];
+    //   if (player == null) return;
+    //   if (fadeDuration != null) {
+    //     final currentUserVol = (player.volume / _masterVolume);
+    //     await _fadeVolume(
+    //       player,
+    //       from: currentUserVol,
+    //       to: 0.0,
+    //       duration: fadeDuration,
+    //     );
+    //   }
+    //   await player.stop();
+    //   _playersByChannel.remove(channelKey);
+    // } else if (audioKey != null) {
+    //   if (!_players.containsKey(audioKey)) return;
+    //   for (final player in _players[audioKey]!) {
+    //     if (fadeDuration != null) {
+    //       final currentUserVol = (player.volume / _masterVolume);
+    //       await _fadeVolume(
+    //         player,
+    //         from: currentUserVol,
+    //         to: 0.0,
+    //         duration: fadeDuration,
+    //       );
+    //     }
+    //     await player.stop();
+    //   }
+    //   _status[audioKey] = AudioStatus.stopped;
+    //   _players.remove(audioKey);
+    // }
   }
 
   @override
@@ -368,9 +358,7 @@ class JustAudioRepository implements AudioRepository {
       if (playPosition != null) {
         await player.seek(playPosition);
       }
-      if (speed != null) {
-        await player.setSpeed(speed);
-      }
+      await player.setSpeed(speed);
       if (fadeDuration != null) {
         final PlayerSettings playerSettings = _playerSettings[player]!;
         await _fadeVolume(
@@ -387,9 +375,7 @@ class JustAudioRepository implements AudioRepository {
         if (playPosition != null) {
           await player.seek(playPosition);
         }
-        if (speed != null) {
-          await player.setSpeed(speed);
-        }
+        await player.setSpeed(speed);
         if (fadeDuration != null) {
           final PlayerSettings playerSettings = _playerSettings[player]!;
           await _fadeVolume(

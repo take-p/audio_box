@@ -104,7 +104,7 @@ class AudioBox implements AudioRepository {
   );
 
   @override
-  Future<void> stop({required String channelKey, Duration? fadeDuration}) =>
+  Future<void> stop({String? channelKey, Duration? fadeDuration}) =>
       _repository.stop(channelKey: channelKey, fadeDuration: fadeDuration);
 
   @override

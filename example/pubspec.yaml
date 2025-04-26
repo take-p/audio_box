@@ -24,4 +24,5 @@ flutter:
 
   assets:
     - assets/bgm/
+    - assets/bgs/
     - assets/se/

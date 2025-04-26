@@ -1,6 +1,6 @@
 name: audio_box
 description: "A flexible audio playback manager for Flutter."
-version: 0.0.4
+version: 0.0.5
 homepage: https://github.com/take-p/audio_box
 
 environment:
@@ -8,10 +8,12 @@ environment:
   flutter: ">=3.10.0"
 
 dependencies:
+  audioplayers: ^6.4.0
   flutter:
     sdk: flutter
   just_audio: ^0.9.46
   meta: ^1.16.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
