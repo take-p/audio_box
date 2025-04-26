@@ -29,57 +29,59 @@ abstract interface class AudioRepository {
 
   /// 音声操作
   ///
-  /// - [key] は必須です。
-  /// - [channel] を指定した場合、そのチャンネルに対して処理を行います。
+  /// - [audioKey] は必須です。
+  /// - [channelKey] を指定した場合、そのチャンネルに対して処理を行います。
   ///   （playメソッドでは、keyとchannelを同時指定可能です）
   /// - [stop]、[pause]、[resume]、[changeVolume]、[changeSpeed] では、keyとchannelが同時指定された場合はエラーをスローし、
   ///   両方とも null の場合は全ての音声に対して処理を行います。
   Future<void> play({
-    required String key,
-    String? channel,
+    required String audioKey,
+    String? channelKey,
+    double volume,
+    double speed,
+    double pitch,
     bool loop = false,
     Duration? fadeDuration,
+    Duration? loopStart,
+    Duration? loopEnd,
     Duration? playPosition,
-    double? playSpeed,
-    Duration? loopStartPosition,
   });
 
-  Future<void> stop({String? key, String? channel, Duration? fadeDuration});
+  Future<void> stop({String? channelKey, Duration? fadeDuration});
 
-  Future<void> pause({String? key, String? channel, Duration? fadeDuration});
+  Future<void> pause({required String channelKey, Duration? fadeDuration});
 
   Future<void> resume({
-    String? key,
-    String? channel,
+    required String channelKey,
+    bool? loop,
+    double volume = 1.0,
+    double speed = 1.0,
+    double pitch = 1.0,
     Duration? fadeDuration,
     Duration? playPosition,
-    double? playSpeed,
   });
 
   /// 音声調整
   Future<void> changeVolume({
-    String? key,
-    String? channel,
+    required String channel,
     required double volume,
     Duration? fadeDuration,
   });
 
   Future<void> changeSpeed({
-    String? key,
-    String? channel,
+    required String channel,
     required double speed,
     Duration? fadeDuration,
   });
 
   Future<void> changePitch({
-    String? key,
-    String? channel,
+    required String channel,
     required double pitch,
     Duration? fadeDuration,
   });
 
   /// 状態取得
-  Future<bool> isPreloaded({required String key});
-  Future<AudioStatus> getStatus({required String key});
-  Future<Duration> getPosition({required String key});
+  Future<bool> isPreloaded({required String channel});
+  Future<AudioStatus> getStatus({required String channel});
+  Future<Duration> getPosition({required String channel});
 }
