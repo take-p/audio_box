@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
 
 import '../../../../audio_box.dart';
 
@@ -29,8 +28,6 @@ class Channel {
   double getVolume() => _volume;
   Future<void> setVolume(double volume) async {
     _volume = volume;
-
-    // 人間の耳に合わせて補正
     await _setPerceivedVolume(volume);
   }
 
@@ -66,69 +63,64 @@ class Channel {
   // 再生
   Future<void> play({
     required String audioKey,
-    double volume = 1.0,
-    double speed = 1.0,
-    double pitch = 1.0,
+    double? volume,
+    double? speed,
+    double? pitch,
     bool loop = false,
     Duration? fadeDuration,
     Duration? loopStart,
     Duration? loopEnd,
     Duration? playPosition,
   }) async {
-    _volume = volume;
-
     // プリロードしていなければ音声読み込み
-    if (!_isPreload) {
+    if (!_isPreload || audioKey != _audioKey) {
       // 指定キーの音声をロード
       Source source = _getSource(audioKey);
       await _player.setSource(source);
+      _audioKey = audioKey;
+      _isPreload = true;
     }
 
-    // ループ設定
-    await _player.setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.stop);
+    // 再生位置を初期に設定
+    await _player.seek(Duration.zero);
 
-    // 再生位置を初期に設定 TODO playとresumeの違いはここだけなので統合できないか？
-    await _player.seek(Duration.zero); // Timeout
-
-    // フェード再生するか否か
-    if (fadeDuration != null) {
-      // すでにフェード再生中の場合は処理をスキップ
-      if (_isFade) {
-        return;
-      }
-
-      // 音量0で再生。TODO 将来的に0以外からフェードさせたいケースがあるかも
-      await _setPerceivedVolume(0.0);
-      await _player.resume();
-      // フェード処理
-      _isFade = true;
-      await _fade(0.0, _volume, fadeDuration);
-      // フェードフラグOFF
-      _isFade = false;
-    } else {
-      // 音量設定
-      await _setPerceivedVolume(volume);
-      // 再生
-      await _player.resume();
-    }
-    return;
+    await _fadeAndPlay(
+      playAction: () => _player.resume(),
+      fadeDuration: fadeDuration,
+      volume: volume,
+      loop: loop,
+    );
   }
 
   Future<void> resume({
     double? volume,
+    double? speed,
+    double? pitch,
     bool? loop,
     Duration? fadeDuration,
   }) async {
     if (volume != null) {
-      _volume = volume;
+      setVolume(volume);
     }
 
+    await _fadeAndPlay(
+      playAction: () => _player.resume(),
+      fadeDuration: fadeDuration,
+      volume: volume,
+    );
+  }
+
+  Future<void> _fadeAndPlay({
+    required Future<void> Function() playAction,
+    Duration? fadeDuration,
+    double? volume,
+    bool? loop,
+  }) async {
     // ループ設定（指定がなければ変更せず）
     if (loop != null) {
       await _player.setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.stop);
     }
 
-    // フェード再生するか否か
     if (fadeDuration != null) {
       // すでにフェード再生中の場合は処理をスキップ
       if (_isFade) {
@@ -138,17 +130,36 @@ class Channel {
       // 音量0で再生。TODO 将来的に0以外からフェードさせたいケースがあるかも
       await _setPerceivedVolume(0.0);
       await _player.resume();
+
       // フェード処理
       _isFade = true;
       await _fade(0.0, _volume, fadeDuration);
-      // フェードフラグOFF
       _isFade = false;
-    } else {
-      // 音量設定
-      //await _setPerceivedVolume(_volume);
-      // 再開
-      await _player.resume();
     }
+    // 音量設定
+    if (volume != null) {
+      await setVolume(volume);
+    }
+    return playAction();
+  }
+
+  // 音声の停止処理
+  Future<void> _fadeAndStop({
+    required Future<void> Function() stopAction,
+    Duration? fadeDuration,
+  }) async {
+    if (fadeDuration != null) {
+      // すでにフェード再生中の場合は処理をスキップ
+      if (_isFade) {
+        return;
+      }
+
+      // フェード処理
+      _isFade = true;
+      await _fade(_volume, 0.0, fadeDuration);
+      _isFade = false;
+    }
+    await stopAction();
   }
 
   Future<void> pause({Duration? fadeDuration}) async {
@@ -163,24 +174,6 @@ class Channel {
       stopAction: () => _player.stop(),
       fadeDuration: fadeDuration,
     );
-  }
-
-  // 音声の停止処理
-  Future<void> _fadeAndStop({
-    required Future<void> Function() stopAction,
-    Duration? fadeDuration,
-  }) async {
-    if (fadeDuration != null) {
-      _isFade = true;
-      await _fade(_volume, 0.0, fadeDuration);
-      _isFade = false;
-    }
-    await stopAction();
-  }
-
-  // 人間の耳に合わせて補正
-  double _adjustVolume(double volume) {
-    return pow(volume, 2).toDouble();
   }
 
   Source _getSource(String key) {
@@ -229,7 +222,8 @@ class Channel {
 
   Future<void> _setPerceivedVolume(double volume) async {
     // 人間の耳に合わせて補正
-    final perceivedVolume = _adjustVolume(volume);
+    final perceivedVolume = pow(volume, 2).toDouble();
+
     await _player.setVolume(perceivedVolume);
   }
 }
