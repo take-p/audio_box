@@ -30,8 +30,7 @@ class Channel {
     _volume = volume;
 
     // 人間の耳に合わせて補正
-    final perceivedVolume = _adjustVolume(volume);
-    await _player.setVolume(perceivedVolume);
+    await _setPerceivedVolume(volume);
   }
 
   double getSpeed() => _speed;
@@ -96,7 +95,7 @@ class Channel {
       }
 
       // 音量0で再生。TODO 将来的に0以外からフェードさせたいケースがあるかも
-      await _player.setVolume(0.0);
+      await _setPerceivedVolume(0.0);
       await _player.resume();
       // フェード処理
       _isFade = true;
@@ -105,8 +104,7 @@ class Channel {
       _isFade = false;
     } else {
       // 音量設定
-      final perceivedVolume = _adjustVolume(volume);
-      await _player.setVolume(perceivedVolume);
+      await _setPerceivedVolume(volume);
       // 再生
       await _player.resume();
     }
@@ -126,14 +124,13 @@ class Channel {
     // フェード再生するか否か
     if (fadeDuration != null) {
       // 音量0で再生。TODO 将来的に0以外からフェードさせたいケースがあるかも
-      await _player.setVolume(0.0);
+      await _setPerceivedVolume(0.0);
       await _player.resume();
       // フェード処理
       await _fade(_player, 0.0, _volume, fadeDuration);
     } else {
       // 音量設定
-      final double adjustedVolume = _adjustVolume(_volume);
-      await _player.setVolume(adjustedVolume);
+      _setPerceivedVolume(_volume);
       // 再開
       await _player.resume();
     }
@@ -220,5 +217,11 @@ class Channel {
       // 待機
       await Future.delayed(Duration(milliseconds: stepTime));
     }
+  }
+
+  Future<void> _setPerceivedVolume(double volume) async {
+    // 人間の耳に合わせて補正
+    final perceivedVolume = _adjustVolume(volume);
+    await _player.setVolume(perceivedVolume);
   }
 }
