@@ -1,8 +1,8 @@
 ## 0.0.1
 - Initial release
-## [0.0.2] - 2025-04-05
+## 0.0.2
 - Rename: Fixed leftover references from `AudioKit` to `AudioBox`
-## [0.0.3] - 2025-04-05
+## 0.0.3
 
 ### ✨ 新機能
 - `key` 引数の省略をサポートするように変更：
@@ -16,13 +16,13 @@
 - `AudioRepository` のメソッドシグネチャを調整し、柔軟性を向上。
 - コードの可読性と堅牢性を強化。
 - 
-## [0.0.4] - 2025-04-06
+## 0.0.4
 
 ### 変更点
 - メソッド`setVolume`を`changeVolueme`に改名。
 - AudioRepositoryインターフェースとAudioBoxクラスで実装メソッドの引数の型に違いがあった点を修正
 - 
-## [0.0.5] - 2025-04-27
+## 0.0.5
 
 ### 変更点
 - デフォルトで使用するパッケージを`just_audio`から`audioplayers`に変更
