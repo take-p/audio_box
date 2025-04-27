@@ -50,11 +50,7 @@ class _AudioDemoScreenState extends State<AudioDemoScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: ElevatedButton(
         onPressed: onPressed,
-        //child: Align(alignment: Alignment.centerLeft, child: Text(label)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [Text(label), Text("")],
-        ),
+        child: Align(alignment: Alignment.centerLeft, child: Text(label)),
       ),
     );
   }
@@ -81,8 +77,8 @@ class _AudioDemoScreenState extends State<AudioDemoScreen> {
                     onChanged: (value) async {
                       setState(() {
                         _masterVolume = value;
+                        _audioBox.setMasterVolume(value);
                       });
-                      //await _audioBox.setVolume(value); // 音量を設定
                     },
                   ),
                 ),

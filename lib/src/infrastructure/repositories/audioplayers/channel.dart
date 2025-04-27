@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:audio_box/src/infrastructure/repositories/audioplayers/audioplayers_repository.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../../../../audio_box.dart';
 
@@ -17,18 +19,26 @@ class Channel {
   bool _isPreload = false;
 
   // 音量
-  double _volume = 1.0;
+  double _volume = 0.5;
   double _speed = 1.0;
   double _pitch = 1.0;
 
   Channel({required Map<String, AudioSourceEntry> sources}) {
     _sources = sources;
+    _setPerceivedVolume(_volume);
   }
 
+  // チャンネルのボリュームを取得
   double getVolume() => _volume;
+  // チャンネルのボリュームを設定
   Future<void> setVolume(double volume) async {
     _volume = volume;
     await _setPerceivedVolume(volume);
+  }
+
+  // 音声のボリュームを更新
+  Future<void> updateVolume() async {
+    await _setPerceivedVolume(_volume);
   }
 
   double getSpeed() => _speed;
@@ -99,67 +109,12 @@ class Channel {
     bool? loop,
     Duration? fadeDuration,
   }) async {
-    if (volume != null) {
-      setVolume(volume);
-    }
-
     await _fadeAndPlay(
       playAction: () => _player.resume(),
       fadeDuration: fadeDuration,
       volume: volume,
+      loop: loop,
     );
-  }
-
-  Future<void> _fadeAndPlay({
-    required Future<void> Function() playAction,
-    Duration? fadeDuration,
-    double? volume,
-    bool? loop,
-  }) async {
-    // ループ設定（指定がなければ変更せず）
-    if (loop != null) {
-      await _player.setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.stop);
-    }
-
-    if (fadeDuration != null) {
-      // すでにフェード再生中の場合は処理をスキップ
-      if (_isFade) {
-        return;
-      }
-
-      // 音量0で再生。TODO 将来的に0以外からフェードさせたいケースがあるかも
-      await _setPerceivedVolume(0.0);
-      await _player.resume();
-
-      // フェード処理
-      _isFade = true;
-      await _fade(0.0, _volume, fadeDuration);
-      _isFade = false;
-    }
-    // 音量設定
-    if (volume != null) {
-      await setVolume(volume);
-    }
-    return playAction();
-  }
-
-  // 音声の停止処理
-  Future<void> _fadeAndStop({
-    required Future<void> Function() stopAction,
-    Duration? fadeDuration,
-  }) async {
-    if (fadeDuration != null) {
-      // すでにフェード再生中の場合は処理をスキップ
-      if (_isFade) {
-        return;
-      }
-
-      // フェード処理
-      _isFade = true;
-      await _fade(_volume, 0.0, fadeDuration);
-      _isFade = false;
-    }
-    await stopAction();
   }
 
   Future<void> pause({Duration? fadeDuration}) async {
@@ -200,7 +155,57 @@ class Channel {
     }
   }
 
+  Future<void> _fadeAndPlay({
+    required Future<void> Function() playAction,
+    Duration? fadeDuration,
+    double? volume,
+    bool? loop,
+  }) async {
+    // ループ設定（指定がなければ変更せず）
+    if (loop != null) {
+      await _player.setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.stop);
+    }
+
+    if (fadeDuration != null) {
+      // すでにフェード再生中の場合は処理をスキップ
+      if (_isFade) {
+        return;
+      }
+
+      // 音量0で再生。TODO 将来的に0以外からフェードさせたいケースがあるかも
+      await _setPerceivedVolume(0.0);
+      await playAction();
+
+      // フェード処理
+      await _fade(0.0, _volume, fadeDuration);
+    }
+    // 音量設定
+    if (volume != null) {
+      await setVolume(volume);
+    }
+    return playAction();
+  }
+
+  // 音声の停止処理
+  Future<void> _fadeAndStop({
+    required Future<void> Function() stopAction,
+    Duration? fadeDuration,
+  }) async {
+    if (fadeDuration != null) {
+      // すでにフェード再生中の場合は処理をスキップ
+      if (_isFade) {
+        return;
+      }
+
+      // フェード処理
+      await _fade(_volume, 0.0, fadeDuration);
+    }
+    await stopAction();
+  }
+
   Future<void> _fade(double from, double to, Duration duration) async {
+    _isFade = true;
+
     // ボリュームを切り替える粒度。細かいほど自然
     const steps = 32;
     // フェード時間をステップ数で割り、1ステップあたりの時間を計算
@@ -218,11 +223,23 @@ class Channel {
       // 待機
       await Future.delayed(Duration(milliseconds: stepTime));
     }
+
+    _isFade = false;
   }
 
   Future<void> _setPerceivedVolume(double volume) async {
+    debugPrint("volume: $volume");
+    debugPrint("masterVolume: ${AudioPlayersRepository.masterVolume}");
+
+    // 設定ボリュームにマスターボリューム計数を掛け合わせ
+    final effectiveVolume = volume * AudioPlayersRepository.masterVolume;
+
+    debugPrint("effectiveVolume: $effectiveVolume");
+
     // 人間の耳に合わせて補正
-    final perceivedVolume = pow(volume, 2).toDouble();
+    final perceivedVolume = pow(effectiveVolume, 2).toDouble();
+
+    debugPrint("perceivedVolume: $perceivedVolume");
 
     await _player.setVolume(perceivedVolume);
   }

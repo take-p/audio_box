@@ -1,3 +1,11 @@
+## 0.0.7
+
+### 変更点
+- マスターボリューム機能を追加
+
+### Changes
+- Added master volume functionality.
+
 ## 0.0.6
 
 ### 変更点

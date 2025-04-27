@@ -17,7 +17,7 @@ Add `audio_box` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  audio_box: ^0.0.1
+  audio_box: ^0.0.7
 ```
 
 Then import it:
