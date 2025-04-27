@@ -38,7 +38,7 @@ class AudioDemoScreen extends StatefulWidget {
 
 class _AudioDemoScreenState extends State<AudioDemoScreen> {
   static final AudioBox _audioBox = AudioBox();
-  double _masterVolume = 0.5; // 初期音量
+  double _masterVolume = 1.0; // 初期音量
 
   Widget buildButton(
     String label,
