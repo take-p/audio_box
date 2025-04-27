@@ -115,9 +115,9 @@ class AudioBox implements AudioRepository {
   Future<void> resume({
     required String channelKey,
     bool? loop,
-    double volume = 1.0,
-    double speed = 1.0,
-    double pitch = 1.0,
+    double? volume,
+    double? speed,
+    double? pitch,
     Duration? fadeDuration,
     Duration? playPosition,
   }) => _repository.resume(

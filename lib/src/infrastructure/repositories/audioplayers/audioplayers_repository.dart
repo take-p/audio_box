@@ -14,37 +14,36 @@ class AudioPlayersRepository implements AudioRepository {
   /// volumeは3種類ある。
   /// - volume: プレーヤーごとのボリューム
   /// - masterVolume: 全体の出力レベル
-  /// - actualVolume: プレーヤーのボリュームに全体の出力レベルを掛けたもの
-  /// - adjustedVolume: 人間の耳に合わせて補正した値
-  double _masterVolume = 0.5;
-  double _masterSpeed = 1.0;
-  double _masterPitch = 1.0;
+  /// - effectiveVolume: プレーヤーのボリュームに全体の出力レベルを掛けたもの
+  /// - perceivedVolume: 人間の耳に合わせて補正した値
+  static double masterVolume = 1.0;
+  static double masterSpeed = 1.0;
+  static double masterPitch = 1.0;
 
   @override
-  double getMasterVolume() => _masterVolume;
+  double getMasterVolume() => masterVolume;
   @override
   Future<void> setMasterVolume(double volume) async {
-    _masterVolume = volume;
+    masterVolume = volume;
 
     // 全てのチャンネルのボリュームを変更
     for (Channel channel in _channels.values) {
-      final effectiveVolume = channel.getVolume() * _masterVolume;
-      channel.setVolume(effectiveVolume);
+      channel.updateVolume();
     }
   }
 
   @override
-  double getMasterSpeed() => _masterSpeed;
+  double getMasterSpeed() => masterSpeed;
   @override
   Future<void> setMasterSpeed(double speed) async {
-    _masterSpeed = speed;
+    masterSpeed = speed;
   }
 
   @override
-  double getMasterPitch() => _masterPitch;
+  double getMasterPitch() => masterPitch;
   @override
   Future<void> setMasterPitch(double pitch) async {
-    _masterPitch = pitch;
+    masterPitch = pitch;
   }
 
   // リソース登録
@@ -92,9 +91,9 @@ class AudioPlayersRepository implements AudioRepository {
   Future<void> play({
     required String audioKey,
     String? channelKey,
-    double volume = 1.0,
-    double speed = 1.0,
-    double pitch = 1.0,
+    double? volume,
+    double? speed,
+    double? pitch,
     bool loop = false,
     Duration? loopStart,
     Duration? loopEnd,
@@ -104,12 +103,9 @@ class AudioPlayersRepository implements AudioRepository {
     // チャンネル取得
     Channel channel = _getChannel(channelKey);
 
-    // マスターボリューム反映
-    final effectiveVolume = volume * _masterVolume;
-
     channel.play(
       audioKey: audioKey,
-      volume: effectiveVolume,
+      volume: volume,
       loop: loop,
       fadeDuration: fadeDuration,
     );
@@ -118,9 +114,9 @@ class AudioPlayersRepository implements AudioRepository {
   @override
   Future<void> resume({
     required String channelKey,
-    double volume = 1.0,
-    double speed = 1.0,
-    double pitch = 1.0,
+    double? volume,
+    double? speed,
+    double? pitch,
     bool? loop,
     Duration? fadeDuration,
     Duration? playPosition,
@@ -128,10 +124,7 @@ class AudioPlayersRepository implements AudioRepository {
     // チャンネル取得
     Channel channel = _getChannel(channelKey);
 
-    // マスターボリューム反映
-    final effectiveVolume = volume * _masterVolume;
-
-    channel.resume(volume: effectiveVolume, fadeDuration: fadeDuration);
+    channel.resume(volume: volume, fadeDuration: fadeDuration);
   }
 
   @override
@@ -172,7 +165,7 @@ class AudioPlayersRepository implements AudioRepository {
 
     // player.setVolume(volume);
 
-    _channels[channel]?.setVolume(volume * _masterVolume);
+    _channels[channel]?.setVolume(volume * masterVolume);
   }
 
   @override

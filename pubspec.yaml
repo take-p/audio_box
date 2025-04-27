@@ -1,6 +1,6 @@
 name: audio_box
 description: "A flexible audio playback manager for Flutter."
-version: 0.0.6
+version: 0.0.8
 homepage: https://github.com/take-p/audio_box
 
 environment:

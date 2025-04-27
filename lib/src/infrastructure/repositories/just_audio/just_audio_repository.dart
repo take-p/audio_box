@@ -320,9 +320,9 @@ class JustAudioRepository implements AudioRepository {
   Future<void> resume({
     String? key,
     String? channelKey,
-    double volume = 1.0,
-    double speed = 1.0,
-    double pitch = 1.0,
+    double? volume,
+    double? speed,
+    double? pitch,
     bool? loop,
     Duration? fadeDuration,
     Duration? playPosition,
@@ -358,7 +358,9 @@ class JustAudioRepository implements AudioRepository {
       if (playPosition != null) {
         await player.seek(playPosition);
       }
-      await player.setSpeed(speed);
+      if (speed != null) {
+        await player.setSpeed(speed);
+      }
       if (fadeDuration != null) {
         final PlayerSettings playerSettings = _playerSettings[player]!;
         await _fadeVolume(
@@ -375,7 +377,9 @@ class JustAudioRepository implements AudioRepository {
         if (playPosition != null) {
           await player.seek(playPosition);
         }
-        await player.setSpeed(speed);
+        if (speed != null) {
+          await player.setSpeed(speed);
+        }
         if (fadeDuration != null) {
           final PlayerSettings playerSettings = _playerSettings[player]!;
           await _fadeVolume(
