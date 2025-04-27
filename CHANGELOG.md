@@ -1,3 +1,11 @@
+## 0.0.8
+
+### 変更点
+- デフォルトの音量を微調整
+
+### Changes
+- Fine-tuned the default volume.
+
 ## 0.0.7
 
 ### 変更点
