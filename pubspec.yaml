@@ -4,7 +4,7 @@ version: 0.0.8
 homepage: https://github.com/take-p/audio_box
 
 environment:
-  sdk: ^3.7.0
+  sdk: ^3.6.0
   flutter: ">=3.10.0"
 
 dependencies:
