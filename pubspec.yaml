@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   just_audio: ^0.9.46
-  meta: ^1.16.0
+  meta: ^1.15.0
   uuid: ^4.5.1
 
 dev_dependencies:
